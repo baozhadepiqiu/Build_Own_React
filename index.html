@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>build your own React</title>
+</head>
+
+<body>
+    <div id="app">
+
+    </div>
+    <script>
+
+        const element = {
+            type: "h1",
+            props: {
+                title: "foo",
+                children: [
+
+                ]
+            }
+        }
+
+        let nextUnitOfWork = null;
+
+        function workLoop(deadline) {
+            let shouldYield = false
+            while (nextUnitOfWork && !shouldYield) {
+                nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
+                shouldYield = deadline.timeReming() < 1
+            }
+            requestIdleCallback(workLoop)
+        } 
+
+        function performUnitOfWork(nextUnitOfWork){
+            // todos
+        }
+
+        function createElement(type, props, ...children) {
+            return {
+                type,
+                props: {
+                    ...props,
+                    children: children.map((child) =>
+                        typeof child === "object" ? child : createTextElement(child)
+                    )
+                }
+            }
+        }
+        
+        const createTextElement = (text) => {
+            return {
+                type: "TEXT_ELEMENT",
+                props: {
+                    nodeValue: text,
+                    children: []
+                }
+            }
+        }
+
+        const render = (element, container) => {
+            const dom = element.type === "TEXT_ELEMENT" ?
+                document.createTextNode("") : document.createElement(element.type)
+
+            const isProperty = (key) => key !== "children"
+
+            Object.keys(element.props) // 该方法返回 element 所有的键
+                .filter(isProperty)
+                .forEach((name) =>   /* 将 children 意外的所有属性赋值给 dom */
+                    dom[name] = element.props[name]
+                )
+
+            element.props.children.forEach((child) => {
+                render(child, dom)
+            });
+            container.appendChild(dom)
+        }
+
+        const Didact = {
+            createElement,
+            render
+        }
+
+        let container = document.getElementById("app");
+        Didact.render(element, container)
+
+    </script>
+</body>
+
+</html>
