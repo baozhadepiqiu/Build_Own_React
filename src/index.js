@@ -50,10 +50,31 @@ function render(element, container) {
     .forEach(name => {
       dom[name] = element.props[name];
     });
-    // 递归的为每一个子节点渲染冰挂载到当前节点
+  // 递归的为每一个子节点渲染冰挂载到当前节点
   element.props.children.forEach(child => render(child, dom));
   // 当前节点所有的节点全部完成后一次性挂载到 container 容器中
   container.appendChild(dom);
+}
+
+// 初始化下一个工作单元
+const nextUnitOfWork = null
+// 工作循环
+function workLoop() {
+  let shouldYeild = false
+  while (nextUnitOfWork && !shouldYeild) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork)
+  }
+  shouldYeild = deadline.timeRemaining() < 1
+  requestIdleCallback(workLoop)
+}
+/**
+ * @auth use requestIdleCallback to make a loop. You can think of requestIdleCallback as a setTimeout
+ */
+requestIdleCallback(workLoop)
+
+// 此函数会执行第一个 工作单元 并且会返回下一个需要执行的工作单元
+function performUnitOfWork(nextUnitOfWork) {
+  // TODO
 }
 
 const Didact = {
@@ -63,11 +84,11 @@ const Didact = {
 
 /** @jsx Didact.createElement */
 const element = (
-  <div style="background: salmon">
-    <h1>Hello World</h1>
-    <h2 style="text-align:right">from Didact</h2>
+  <div>
+    <h1>Here will build My First React App</h1>
+    <h2 style="text-align:right">from LCG</h2>
   </div>
 );
-
+console.log(element);
 const container = document.getElementById("root");
 Didact.render(element, container);
